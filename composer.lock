@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "850358ec9e5ab553dfa295d244ec3c81",
+    "hash": "a10304309b66d125e830ea6a89d70ce6",
     "packages": [
         {
             "name": "geoffroy-aubry/helpers",

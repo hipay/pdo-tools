@@ -1,5 +1,5 @@
 {
-    "name": "hi-media/PDOTools",
+    "name": "hi-media/pdo-tools",
     "description": "PDO Tools",
     "keywords": ["PDO", "lazy loading", "PHPUnit"],
     "require": {
