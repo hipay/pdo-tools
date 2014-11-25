@@ -1,2 +1,10 @@
-/.twgit_features_subject
-/.twgit
+/.settings
+/.buildpath
+/.project
+/build/
+*~
+/vendor/
+composer.phar
+/cache.properties
+/.twgit*
+/.idea/
