@@ -15,10 +15,10 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * Ensure we build DB only once time.
-     * @var bool
+     * List of instances indexed by DSN, to ensure we build DB only once time.
+     * @var PDOAdapter[]
      */
-    private static $isDbBuilt = false;
+    private static $aPDOInstances = array();
 
     protected $sQueryLogPath = '';
 
@@ -67,20 +67,20 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         // $ psql -U postgres template1
         //     CREATE ROLE dw WITH LOGIN;
         //     ALTER ROLE dw SET client_min_messages TO WARNING;
-        if (empty($this->sQueryLogPath)) {
-            $this->sQueryLogPath = $sQueryLogPath;
-        }
-        $this->oDB = PDOAdapter::getInstance($this->aDSN, $this->sQueryLogPath);
-        if (! self::$isDbBuilt) {
-            self::$isDbBuilt = true;
+        $this->sQueryLogPath = $sQueryLogPath;
+        $sKey = implode('|', $this->aDSN);
+        if (! isset(self::$aPDOInstances[$sKey])) {
+            $this->oDB = PDOAdapter::getInstance($this->aDSN, $this->sQueryLogPath);
             try {
                 $this->loadSQLFromFile($sInitDBScript);
                 $this->dropOldDb();
             } catch (\RuntimeException $oException) {
                 var_dump($oException);
-                $this->fail('Build of test DB failed! ' . $oException->getMessage());
+                $this->fail('Test DB\'s build failed! ' . $oException->getMessage());
             }
+            self::$aPDOInstances[$sKey] = $this->oDB;
         }
+        $this->oDB = self::$aPDOInstances[$sKey];
     }
 
     /**

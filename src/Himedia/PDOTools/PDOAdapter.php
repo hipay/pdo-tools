@@ -224,7 +224,7 @@ class PDOAdapter implements DBAdapterInterface
         $this->fTotalElapsedTime += $fElapsedTime;
         $this->iTotalNbQueries++;
 
-        if ($this->sQueryLogPath != '') {
+        if (! empty($this->sQueryLogPath)) {
             $sMilliSec = substr(substr(strstr($this->fStartTime, '.'), 1), 0, 3);
             $sTime = date('Y-m-d H:i:s.' . $sMilliSec . 'O', $this->fStartTime);
             $sMsg = "$this->iTotalNbQueries;$sTime;"
