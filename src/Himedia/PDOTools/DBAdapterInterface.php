@@ -4,6 +4,14 @@ namespace Himedia\PDOTools;
 
 interface DBAdapterInterface
 {
+
+    /**
+     *
+     *
+     * @param string $sQueriesLogPath path where to log all DB queries
+     */
+    public function setQueryLogPath($sQueriesLogPath);
+
     /**
      * Returns content of specified column of the first row of query's result.
      *

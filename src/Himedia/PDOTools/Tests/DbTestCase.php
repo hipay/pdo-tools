@@ -81,6 +81,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
             self::$aPDOInstances[$sKey] = $this->oDB;
         }
         $this->oDB = self::$aPDOInstances[$sKey];
+        $this->oDB->setQueryLogPath($this->sQueryLogPath);
     }
 
     /**

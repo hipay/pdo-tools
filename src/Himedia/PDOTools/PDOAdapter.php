@@ -101,7 +101,7 @@ class PDOAdapter implements DBAdapterInterface
      *		'USERNAME' => (string),
      *		'PASSWORD' => (string)
      * );
-     * @param string $sQueriesLogPath path where to log all queries by DB
+     * @param string $sQueriesLogPath path where to log all DB queries
      */
     private function __construct(array $aDSN, $sQueriesLogPath)
     {
@@ -110,7 +110,18 @@ class PDOAdapter implements DBAdapterInterface
         $this->fStartTime = 0;
         $this->fTotalElapsedTime = 0;
         $this->iTotalNbQueries = 0;
+        $this->setQueryLogPath($sQueriesLogPath);
+    }
+
+    /**
+     * @param string $sQueriesLogPath path where to log all DB queries
+     */
+    public function setQueryLogPath ($sQueriesLogPath)
+    {
         $this->sQueryLogPath = $sQueriesLogPath;
+        if (! empty($this->sQueryLogPath) && ! file_exists(dirname($this->sQueryLogPath))) {
+            mkdir(dirname($this->sQueryLogPath), 0777, true);
+        }
     }
 
     /**
