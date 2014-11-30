@@ -1,11 +1,9 @@
 <?php
 
-namespace Himedia\PDOTools\Tests;
+namespace Himedia\PDOTools;
 
 use GAubry\Helpers\Helpers;
 use GAubry\Logger\MinimalLogger;
-use Himedia\PDOTools\Tools;
-use Himedia\PDOTools\PDOAdapter;
 use Psr\Log\LogLevel;
 
 /**
@@ -123,6 +121,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         /** @noinspection PhpUnusedLocalVariableInspection */
         $sDbUser = (isset($this->aDSN['USERNAME']) ? $this->aDSN['USERNAME'] : '');
 
+        /** @noinspection PhpIncludeInspection */
         $aSQLToProcess = include($sInitDbFile);
         $this->loadSQLFromArray($aSQLToProcess);
     }
