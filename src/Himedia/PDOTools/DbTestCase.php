@@ -5,217 +5,279 @@ namespace Himedia\PDOTools;
 use GAubry\Helpers\Helpers;
 use GAubry\Logger\MinimalLogger;
 use Psr\Log\LogLevel;
+use PDO;
 
 /**
- * Base class for test classes requiring a temporary database.
+ * Base class to build a temporary DB to execute tests.
  */
 abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * List of instances indexed by DSN, to ensure we build DB only once time.
-     * @var PDOAdapter[]
+     * List of DB's name already built (PHPUnit_Framework_TestCase are instantiated more than once).
+     * @var array
      */
-    private static $aPDOInstances = array();
-
-    protected $sQueryLogPath = '';
+    private static $aBuiltDbs = array();
 
     /**
-     *
-     * @var \Himedia\PDOTools\DBAdapterInterface
+     * Backend PDO instance of built DB.
+     * @var PDO
      */
-    protected $oDB;
+    protected $oBuiltDbPdo;
 
-    protected $aDSN;
+    protected $sPdoDriverName;
+
+    protected $sDbHostname;
+    protected $iDbPort;
 
     protected $iMaxDBToKeep;
 
+    protected $aPdoOptions = array(
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => true,
+        PDO::ATTR_TIMEOUT            => 5
+    );
+
     /**
-     * Constructs a test case with the given name.
+     * pgsql:host=localhost;dbname=template1
+     * mysql:host=localhost
      *
-     * @param array $aDSN Database source name: array(
-     * 		'DRIVER'   => (string) e.g. 'pdo_mysql' or 'pdo_pgsql',
-     * 		'HOSTNAME' => (string),
-     * 		'PORT'     => (int),
-     *		'DB_NAME'  => (string),
-     *		'USERNAME' => (string),
-     *		'PASSWORD' => (string)
-     * );
-     * @param  string $sName
-     * @param  array  $aData
-     * @param  string $sDataName
+     * @param string $sInitDBScript
+     * @param array $aDsn array(
+     *     'driver' => 'pgsql', 'mysql', …
+     *     'hostname' =>
+     *     'port' =>
+     *     'dbname' =>
+     *     'username' =>
+     *     'password' =>
+     * )
+     * @param array $aPdoOptions  Driver-specific options for PDO connection.
+     * @param int $iMaxDBToKeep
+     *
+     * @param string $sName     PHPUnit_Framework_TestCase's name.
+     * @param array  $aData     PHPUnit_Framework_TestCase's data.
+     * @param string $sDataName PHPUnit_Framework_TestCase's dataName parameter.
      */
     public function __construct(
-        array $aDSN,
         $sInitDBScript,
-        $sQueryLogPath,
+        array $aDsn,
+        array $aPdoOptions,
         $iMaxDBToKeep = 3,
         $sName = null,
         array $aData = array(),
         $sDataName = ''
     ) {
         parent::__construct($sName, $aData, $sDataName);
-        $this->aDSN = $aDSN;
+
+        $this->sPdoDriverName = $aDsn['driver'];
+        $this->sDbHostname    = $aDsn['hostname'];
+        $this->iDbPort        = (int) $aDsn['port'];
+        $this->sDbName        = $aDsn['dbname'];
+        $this->sDbUser        = $aDsn['username'];
+        $this->sDbPassword    = $aDsn['password'];
+        $this->aPdoOptions    = array_replace($this->aPdoOptions, $aPdoOptions);
 
         // 1 is min to not drop current database:
-        $this->iMaxDBToKeep = max(1, (int)$iMaxDBToKeep);
-        $this->oLogger = new MinimalLogger(LogLevel::DEBUG);
+        $this->iMaxDBToKeep   = max(1, (int)$iMaxDBToKeep);
+        $this->oLogger        = new MinimalLogger(LogLevel::DEBUG);
 
-        // pré-requis :
+        // TODO prerequisite ?
         // $ psql -U postgres template1
         //     CREATE ROLE dw WITH LOGIN;
         //     ALTER ROLE dw SET client_min_messages TO WARNING;
-        $this->sQueryLogPath = $sQueryLogPath;
-        $sKey = implode('|', $this->aDSN);
-        if (! isset(self::$aPDOInstances[$sKey])) {
-            $this->oDB = PDOAdapter::getInstance($this->aDSN, $this->sQueryLogPath);
+
+        // PHPUnit_Framework_TestCase are instantiated more than once…
+        if (! in_array($this->sDbName, self::$aBuiltDbs)) {
             try {
-                $this->loadSQLFromFile($sInitDBScript);
-                $this->dropOldDb();
+                $this->loadSqlFromConfigFile($sInitDBScript, $this->sDbUser, $this->sDbName);
             } catch (\RuntimeException $oException) {
                 var_dump($oException);
-                $this->fail('Test DB\'s build failed! ' . $oException->getMessage());
+                $this->fail('DB\'s building failed! ' . $oException->getMessage());
             }
-            self::$aPDOInstances[$sKey] = $this->oDB;
         }
-        $this->oDB = self::$aPDOInstances[$sKey];
-        $this->oDB->setQueryLogPath($this->sQueryLogPath);
+
+        $this->oBuiltDbPdo = $this->getNewPdoInstance($this->sDbUser, $this->sDbName);
+
+        if (! in_array($this->sDbName, self::$aBuiltDbs)) {
+            $this->dropOldDbs($this->sDbName);
+            self::$aBuiltDbs[$this->sDbName] = true;
+        }
     }
 
     /**
-     * Destructor.
+     * @param $sDbUser
+     * @param $sDbName
+     * @return PDO
      */
-    public function __destruct ()
+    private function getNewPdoInstance ($sDbUser, $sDbName)
     {
-        if (! empty($this->sQueryLogPath) && file_exists($this->sQueryLogPath)) {
-            unlink($this->sQueryLogPath);
-        }
-    }
-
-    protected function loadRawSQLFromFile ($sFilePath)
-    {
-        $aSQLToProcess = array(
-            array(
-                $this->aDSN['USERNAME'],
-                $this->aDSN['DB_NAME'],
-                $sFilePath
-            ),
-        );
-        $this->loadSQLFromArray($aSQLToProcess);
+        $sDsn = "$this->sPdoDriverName:host=$this->sDbHostname;port=$this->iDbPort;"
+            . "dbname=$sDbName;user=$sDbUser;password=";
+        return new PDO($sDsn, null, null, $this->aPdoOptions);
     }
 
     /**
      * Build a temporary DB to execute tests.
      *
      * @param string $sInitDbFile SQL commands to initialize test DB
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
-     * @throws \RuntimeException if error when loading SQL file
+     * @param string $sDbUser
+     * @param string $sDbName
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function loadSQLFromFile ($sInitDbFile)
-    {
-        /** @var $sDbName string DB name injected into DB initialization file via below include(). */
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $sDbName = (isset($this->aDSN['DB_NAME']) ? $this->aDSN['DB_NAME'] : '');
-
-        /** @var $sDbUser string Username injected into DB initialization file via below include(). */
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $sDbUser = (isset($this->aDSN['USERNAME']) ? $this->aDSN['USERNAME'] : '');
-
+    protected function loadSqlFromConfigFile (
+        $sInitDbFile,
+        /** @noinspection PhpUnusedParameterInspection */
+        $sDbUser = '',
+        /** @noinspection PhpUnusedParameterInspection */
+        $sDbName = ''
+    ) {
         /** @noinspection PhpIncludeInspection */
         $aSQLToProcess = include($sInitDbFile);
-        $this->loadSQLFromArray($aSQLToProcess);
+        $this->loadSqlFromConfigArray($aSQLToProcess);
     }
 
-    private function loadSQLCommands ($sDbUser, $sDbName, $sCommands)
+    /**
+     * @param string $sSql One or more SQL statements
+     * @param $sDbUser
+     * @param $sDbName
+     */
+    private function execSql ($sSql, $sDbUser, $sDbName)
     {
-        if ($this->aDSN['DRIVER'] == 'pdo_pgsql') {
-            $sHostname = $this->aDSN['HOSTNAME'];
-            $iPort = (int) $this->aDSN['PORT'];
-            $sPSQL = "psql -v ON_ERROR_STOP=1 -h $sHostname -p $iPort";
+        $this->getNewPdoInstance($sDbUser, $sDbName)
+            ->exec($sSql);
+    }
 
-            if (preg_match('/^\/[a-z0-9_.\/ -]+\.sql(\.gz)?$/i', $sCommands) === 1) {
-                if (preg_match('/^\/[a-z0-9_.\/ -]+\.sql$/i', $sCommands) === 1 && filesize($sCommands) < 1024*1024) {
-                    $sQueries = file_get_contents($sCommands);
-                    $this->oDB->exec($sQueries);
-                } else {
-                    $sTmpFilename = tempnam(sys_get_temp_dir(), 'dw-db-builder_');
-                    $sCmd = "zcat -f '$sCommands' > '$sTmpFilename'"
-                        . " && $sPSQL -U $sDbUser $sDbName --file '$sTmpFilename'"
-                        . " && rm -f '$sTmpFilename'";
-                    $this->oLogger->debug('[DEBUG] shell# ' . trim($sCmd, " \t"));
-                    try {
-                        Helpers::exec($sCmd);
-                    } catch (\RuntimeException $oException) {
-                        if (file_exists($sTmpFilename)) {
-                            unlink($sTmpFilename);
-                        }
-                        throw $oException;
-                    }
-                }
-            } else {
-                if (substr($sCommands, -1) != ';') {
-                    $sCommands .= ';';
-                }
-                $sCmd = "$sPSQL -U $sDbUser $sDbName -c \"$sCommands\"";
-                $this->oLogger->debug('[DEBUG] shell# ' . trim($sCmd, " \t"));
-                Helpers::exec($sCmd);
-            }
+    /**
+     * @param string $sFilename Path to raw or gzipped SQL file.
+     * @param $sDbUser
+     * @param $sDbName
+     */
+    private function loadBigSqlDumpFile ($sFilePath, $sDbUser, $sDbName)
+    {
+        if ($this->sPdoDriverName == 'pgsql') {
+            $sCmd = "psql -v ON_ERROR_STOP=1 -h $this->sDbHostname -p $this->iDbPort -U $sDbUser $sDbName "
+                . "--file '$sFilePath'";
+            $this->oLogger->debug("[DEBUG] shell# $sCmd");
+            Helpers::exec($sCmd);
+
         } else {
-            $sErrMsg = "Driver type '{$this->aDSN['DRIVER']}' not handled for loading SQL commands!";
+            $sErrMsg = "Driver type '$this->sPdoDriverName' not handled for loading SQL commands!";
             throw new \UnexpectedValueException($sErrMsg, 1);
         }
     }
 
+    protected function loadSqlDumpFile ($sFilePath, $sDbUser = '', $sDbName = '')
+    {
+        $sDbUser = $sDbUser ?: $this->sDbUser;
+        $sDbName = $sDbName ?: $this->sDbName;
+
+        // If gzipped dump file:
+        if (preg_match('/\.gz$/i', $sFilePath)) {
+            $sTmpFilePath = tempnam(sys_get_temp_dir(), 'dw-db-builder_');
+            $sCmd = "zcat -f '$sFilePath' > '$sTmpFilePath'";
+            $this->oLogger->debug("[DEBUG] shell# $sCmd");
+            try {
+                Helpers::exec($sCmd);
+            } catch (\RuntimeException $oException) {
+                if (file_exists($sTmpFilePath)) {
+                    unlink($sTmpFilePath);
+                }
+                throw $oException;
+            }
+
+            $this->loadSqlDumpFile($sTmpFilePath, $sDbUser, $sDbName);
+
+            $sCmd = "rm -f '$sTmpFilePath'";
+            $this->oLogger->debug("[DEBUG] shell# $sCmd");
+            Helpers::exec($sCmd);
+
+            // If <1 Mio uncompressed dump file:
+        } elseif (filesize($sFilePath) < 1024*1024) {
+            $sSql = file_get_contents($sFilePath);
+            $this->execSql($sSql, $sDbUser, $sDbName);
+
+            // If ≥1 Mio uncompressed dump file:
+        } else {
+            $this->loadBigSqlDumpFile($sFilePath, $sDbUser, $sDbName);
+        }
+    }
+
     /**
-     * Build a temporary DB to execute tests.
+     *
      *
      * @param array $aSQL SQL commands to initialize test DB
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      * @throws \RuntimeException if error when loading SQL file
      */
-    protected function loadSQLFromArray (array $aSQL)
+    protected function loadSqlFromConfigArray (array $aSQL)
     {
         foreach ($aSQL as $aStatement) {
             list($sDbUser, $sDbName, $sCommands) = $aStatement;
-            $this->loadSQLCommands($sDbUser, $sDbName, $sCommands);
+            if (preg_match('/(\.sql|\.gz)$/i', $sCommands) === 1) {
+                $this->loadSqlDumpFile($sCommands, $sDbUser, $sDbName);
+            } else {
+                if (substr($sCommands, -1) != ';') {
+                    $sCommands .= ';';
+                }
+                $this->execSql($sCommands, $sDbUser, $sDbName);
+            }
         }
     }
 
     private function getAllDb ($sPrefixDb)
     {
-        if ($this->aDSN['DRIVER'] == 'pdo_pgsql') {
+        if ($this->sPdoDriverName == 'pgsql') {
             $sQuery = "
                     SELECT datname AS dbname FROM pg_database
-                    WHERE datname ~ '^{$sPrefixDb}_[0-9]+$' ORDER BY datname ASC;";
+                    WHERE datname ~ '^{$sPrefixDb}_[0-9]+$' ORDER BY datname ASC";
         } else {
-            $sErrMsg = "Driver type '{$this->aDSN['DRIVER']}' not handled for listing all databases!";
+            $sErrMsg = "Driver type '$this->sPdoDriverName' not handled for listing all databases!";
             throw new \UnexpectedValueException($sErrMsg, 1);
         }
-        $aAllDb = $this->oDB->fetchAll($sQuery);
+        $aAllDb = $this->pdoFetchAll($sQuery);
         return $aAllDb;
     }
 
     /**
-     * Drop old test DBs.
+     * Fetch all rows.
+     *
+     * @param string $sQuery
+     * @param array $aValues Values to bind to the SQL statement.
+     * @return array an associative array
      */
-    private function dropOldDb ()
+    protected function pdoFetchAll($sQuery, array $aValues = array())
     {
-        $sDbName = $this->aDSN['DB_NAME'];
-        if (preg_match('/^(.*)_[0-9]+$/i', $sDbName, $aMatches) === 1) {
+        $oPdoStatement = $this->oBuiltDbPdo->prepare($sQuery);
+        $oPdoStatement->execute($aValues);
+        return $oPdoStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Drop old test DBs.
+     *
+     * @param string $sCurrentDbName Current DB name, not to remove.
+     */
+    private function dropOldDbs ($sCurrentDbName)
+    {
+        if (preg_match('/^(.*)_[0-9]+$/i', $sCurrentDbName, $aMatches) === 1) {
+            $this->oLogger->info('Searching too old databases…');
             $aAllDb = $this->getAllDb($aMatches[1]);
             if (count($aAllDb) > $this->iMaxDBToKeep) {
-                $aOldDb = array_slice($aAllDb, 0, -$this->iMaxDBToKeep);
-                foreach ($aOldDb as $aDb) {
-                    $sOldDb = $aDb['dbname'];
-                    $sQuery = "DROP DATABASE IF EXISTS $sOldDb;";
-                    $this->oLogger->debug("[DEBUG] SQL# $sQuery");
-                    $this->oDB->exec($sQuery);
+                $aTooOldDbs = array_slice($aAllDb, 0, -$this->iMaxDBToKeep);
+                foreach ($aTooOldDbs as $aDb) {
+                    $sTooOldDb = $aDb['dbname'];
+                    $this->oLogger->info("    Dropping '$sTooOldDb' database…");
+                    $this->oBuiltDbPdo->exec("DROP DATABASE IF EXISTS $sTooOldDb;");
                 }
+                $this->oLogger->info('    Done.');
+            } else {
+                $this->oLogger->info('    No DB to delete.');
             }
         }
     }
 
-    protected function assertQueryReturnsNothing ($sQuery)
+    protected function assertQueryReturnsNoRows ($sQuery)
     {
         $sResultCsv = $this->convertQuery2Csv($sQuery);
         $this->assertEmpty($sResultCsv);
@@ -230,7 +292,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 
     protected function convertQuery2Csv ($sQuery)
     {
-        $aRows = $this->oDB->fetchAll($sQuery);
+        $aRows = $this->pdoFetchAll($sQuery);
         return Tools::convertAssocRows2Csv($aRows);
     }
 
