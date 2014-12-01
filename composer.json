@@ -4,7 +4,6 @@
     "keywords": ["PDO", "lazy loading", "PHPUnit"],
     "require": {
         "ext-PDO":                     "*",
-        "geoffroy-aubry/helpers":      "1.*",
         "geoffroy-aubry/logger":       "1.*",
         "php":                         ">=5.3.3",
         "psr/log":                     "~1.0"
