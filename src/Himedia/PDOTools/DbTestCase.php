@@ -483,8 +483,11 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
             };
         }
 
-        return $this->getMock('\PDOStatement')
-                    ->expects($this->any())->method('fetch')
-                    ->will($this->returnCallback($callback));
+        // Doesn't work if full chain pattern:
+        $oPdoStmt = $this->getMock('\PDOStatement');
+        $oPdoStmt
+            ->expects($this->any())->method('fetch')
+            ->will($this->returnCallback($callback));
+        return $oPdoStmt;
     }
 }
