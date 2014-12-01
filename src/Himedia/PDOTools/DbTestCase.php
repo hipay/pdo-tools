@@ -8,7 +8,7 @@ use Psr\Log\LogLevel;
 use PDO;
 
 /**
- * Base class to build a temporary DB to execute tests.
+ * Base class to build databases to execute tests.
  */
 abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -25,13 +25,46 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $oBuiltDbPdo;
 
+    /**
+     * PDO driver name, e.g. 'pgsql' or 'mysql'.
+     * @var string
+     */
     protected $sPdoDriverName;
 
+    /**
+     * Test DB hostname.
+     * @var string
+     */
     protected $sDbHostname;
+
+    /**
+     * Test DB port.
+     * @var int
+     */
     protected $iDbPort;
 
-    protected $iMaxDBToKeep;
+    /**
+     * Test DB name.
+     * @var string
+     */
+    protected $sDbName;
 
+    /**
+     * Test DB username.
+     * @var string
+     */
+    protected $sDbUser;
+
+    /**
+     * Test DB password.
+     * @var string
+     */
+    protected $sDbPassword;
+
+    /**
+     * Default PDO options on new instantiation.
+     * @var array
+     */
     protected $aPdoOptions = array(
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -40,35 +73,41 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     );
 
     /**
-     * pgsql:host=localhost;dbname=template1
-     * mysql:host=localhost
+     * Max number of test DBs to keep.
+     * @var int
+     */
+    protected $iMaxDbToKeep;
+
+    /**
+     * Build a database for tests and drop too old ones.
      *
-     * @param string $sInitDBScript
-     * @param array $aDsn array(
-     *     'driver' => 'pgsql', 'mysql', …
-     *     'hostname' =>
-     *     'port' =>
-     *     'dbname' =>
-     *     'username' =>
-     *     'password' =>
+     * @param array $aDsn Data source name of DB to build.
+     * Structure: array(
+     *     'driver'   => 'pgsql|mysql|…',
+     *     'hostname' => '…',
+     *     'port'     => '…',
+     *     'dbname'   => '…',
+     *     'username' => '…',
+     *     'password' => '…',
      * )
-     * @param array $aPdoOptions  Driver-specific options for PDO connection.
-     * @param int $iMaxDBToKeep
+     * @param array  $aPdoOptions  Driver-specific options for PDO connection.
+     * @param int    $iMaxDbToKeep Max number of test databases to keep.
+     * @param string $sDbBuildFile SQL directives to build database (@see loadSqlBuildFile())
      *
-     * @param string $sName     PHPUnit_Framework_TestCase's name.
-     * @param array  $aData     PHPUnit_Framework_TestCase's data.
-     * @param string $sDataName PHPUnit_Framework_TestCase's dataName parameter.
+     * @param string $sTCName      PHPUnit_Framework_TestCase's name.
+     * @param array  $aTCData      PHPUnit_Framework_TestCase's data.
+     * @param string $sTCDataName  PHPUnit_Framework_TestCase's dataName parameter.
      */
     public function __construct(
-        $sInitDBScript,
         array $aDsn,
         array $aPdoOptions,
-        $iMaxDBToKeep = 3,
-        $sName = null,
-        array $aData = array(),
-        $sDataName = ''
+        $sDbBuildFile,
+        $iMaxDbToKeep  = 3,
+        $sTCName       = null,
+        array $aTCData = array(),
+        $sTCDataName   = ''
     ) {
-        parent::__construct($sName, $aData, $sDataName);
+        parent::__construct($sTCName, $aTCData, $sTCDataName);
 
         $this->sPdoDriverName = $aDsn['driver'];
         $this->sDbHostname    = $aDsn['hostname'];
@@ -79,18 +118,13 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         $this->aPdoOptions    = array_replace($this->aPdoOptions, $aPdoOptions);
 
         // 1 is min to not drop current database:
-        $this->iMaxDBToKeep   = max(1, (int)$iMaxDBToKeep);
+        $this->iMaxDbToKeep   = max(1, (int)$iMaxDbToKeep);
         $this->oLogger        = new MinimalLogger(LogLevel::DEBUG);
-
-        // TODO prerequisite ?
-        // $ psql -U postgres template1
-        //     CREATE ROLE dw WITH LOGIN;
-        //     ALTER ROLE dw SET client_min_messages TO WARNING;
 
         // PHPUnit_Framework_TestCase are instantiated more than once…
         if (! in_array($this->sDbName, self::$aBuiltDbs)) {
             try {
-                $this->loadSqlFromConfigFile($sInitDBScript, $this->sDbUser, $this->sDbName);
+                $this->loadSqlBuildFile($sDbBuildFile, $this->sDbUser, $this->sDbName);
             } catch (\RuntimeException $oException) {
                 var_dump($oException);
                 $this->fail('DB\'s building failed! ' . $oException->getMessage());
@@ -106,52 +140,65 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $sDbUser
-     * @param $sDbName
+     * Returns a new PDO instance.
+     *
+     * @param string $sDbUser
+     * @param string $sDbName
      * @return PDO
      */
     private function getNewPdoInstance ($sDbUser, $sDbName)
     {
         $sDsn = "$this->sPdoDriverName:host=$this->sDbHostname;port=$this->iDbPort;"
-            . "dbname=$sDbName;user=$sDbUser;password=";
+              . "dbname=$sDbName;user=$sDbUser;password=";
         return new PDO($sDsn, null, null, $this->aPdoOptions);
     }
 
     /**
-     * Build a temporary DB to execute tests.
+     * Load SQL directives from config/build file.
      *
-     * @param string $sInitDbFile SQL commands to initialize test DB
-     * @param string $sDbUser
-     * @param string $sDbName
+     * Config/build file is a PHP file returning a list of array('db-user', 'db-name', 'SQL commands or SQL filename').
+     * All filenames must match following regexp: /(\.sql|\.gz)$/i.
+     * Available/injected variables: $sDbUser, $sDbName.
+     *
+     * Build file example here: /doc/db-build-file-example.php
+     *
+     * @param string $sDbBuildFile SQL directives
+     * @param string $sDbUser      Optional username injected into $sInitDbFile
+     * @param string $sDbName      Optional DB name injected into $sInitDbFile
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function loadSqlFromConfigFile (
-        $sInitDbFile,
+    protected function loadSqlBuildFile (
+        $sDbBuildFile,
         /** @noinspection PhpUnusedParameterInspection */
         $sDbUser = '',
         /** @noinspection PhpUnusedParameterInspection */
         $sDbName = ''
     ) {
         /** @noinspection PhpIncludeInspection */
-        $aSQLToProcess = include($sInitDbFile);
-        $this->loadSqlFromConfigArray($aSQLToProcess);
+        $aSQLDirectives = include($sDbBuildFile);
+        $this->loadSqlBuildArray($aSQLDirectives);
     }
 
     /**
-     * @param string $sSql One or more SQL statements
-     * @param $sDbUser
-     * @param $sDbName
+     * Executes specified SQL statement.
+     *
+     * @param string $sSql    One or more SQL statements
+     * @param string $sDbUser
+     * @param string $sDbName
      */
     private function execSql ($sSql, $sDbUser, $sDbName)
     {
         $this->getNewPdoInstance($sDbUser, $sDbName)
-            ->exec($sSql);
+             ->exec($sSql);
     }
 
     /**
-     * @param string $sFilename Path to raw or gzipped SQL file.
-     * @param $sDbUser
-     * @param $sDbName
+     * Load SQL dump content for file exceeding 1 Mio.
+     *
+     * @param string $sFilePath Path to raw or gzipped SQL file.
+     * @param string $sDbUser
+     * @param string $sDbName
+     * @see loadSqlDumpFile()
      */
     private function loadBigSqlDumpFile ($sFilePath, $sDbUser, $sDbName)
     {
@@ -167,6 +214,13 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Load SQL dump file, possibly gzipped (.gz).
+     *
+     * @param string $sFilePath Dump file
+     * @param string $sDbUser By default the user specified in constructor.
+     * @param string $sDbName By default the DB name specified in constructor.
+     */
     protected function loadSqlDumpFile ($sFilePath, $sDbUser = '', $sDbName = '')
     {
         $sDbUser = $sDbUser ?: $this->sDbUser;
@@ -186,33 +240,38 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
                 throw $oException;
             }
 
+            // recursive call with uncompressed file:
             $this->loadSqlDumpFile($sTmpFilePath, $sDbUser, $sDbName);
 
             $sCmd = "rm -f '$sTmpFilePath'";
             $this->oLogger->debug("[DEBUG] shell# $sCmd");
             Helpers::exec($sCmd);
 
-            // If <1 Mio uncompressed dump file:
+        // If <1 Mio uncompressed dump file:
         } elseif (filesize($sFilePath) < 1024*1024) {
             $sSql = file_get_contents($sFilePath);
             $this->execSql($sSql, $sDbUser, $sDbName);
 
-            // If ≥1 Mio uncompressed dump file:
+        // If ≥1 Mio uncompressed dump file:
         } else {
             $this->loadBigSqlDumpFile($sFilePath, $sDbUser, $sDbName);
         }
     }
 
     /**
+     * Load SQL directives in specified array.
      *
+     * SQL directives are a list of array('db-user', 'db-name', 'SQL commands or SQL filename').
+     * All filenames must match following regexp: /(\.sql|\.gz)$/i.
      *
-     * @param array $aSQL SQL commands to initialize test DB
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
-     * @throws \RuntimeException if error when loading SQL file
+     * Example here: /doc/db-build-file-example.php
+     *
+     * @param array $aSQLDirectives SQL directives to build database
+     * @see loadSqlBuildFile()
      */
-    protected function loadSqlFromConfigArray (array $aSQL)
+    protected function loadSqlBuildArray (array $aSQLDirectives)
     {
-        foreach ($aSQL as $aStatement) {
+        foreach ($aSQLDirectives as $aStatement) {
             list($sDbUser, $sDbName, $sCommands) = $aStatement;
             if (preg_match('/(\.sql|\.gz)$/i', $sCommands) === 1) {
                 $this->loadSqlDumpFile($sCommands, $sDbUser, $sDbName);
@@ -225,6 +284,12 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * List all test DBs created with following name pattern: '^{$sPrefixDb}_[0-9]+$'.
+     *
+     * @param string $sPrefixDb
+     * @return array list of all test DBs
+     */
     private function getAllDb ($sPrefixDb)
     {
         if ($this->sPdoDriverName == 'pgsql') {
@@ -242,9 +307,9 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Fetch all rows.
      *
-     * @param string $sQuery
-     * @param array $aValues Values to bind to the SQL statement.
-     * @return array an associative array
+     * @param  string $sQuery
+     * @param  array  $aValues Values to bind to the SQL statement.
+     * @return array  an associative array
      */
     protected function pdoFetchAll($sQuery, array $aValues = array())
     {
@@ -263,8 +328,8 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         if (preg_match('/^(.*)_[0-9]+$/i', $sCurrentDbName, $aMatches) === 1) {
             $this->oLogger->info('Searching too old databases…');
             $aAllDb = $this->getAllDb($aMatches[1]);
-            if (count($aAllDb) > $this->iMaxDBToKeep) {
-                $aTooOldDbs = array_slice($aAllDb, 0, -$this->iMaxDBToKeep);
+            if (count($aAllDb) > $this->iMaxDbToKeep) {
+                $aTooOldDbs = array_slice($aAllDb, 0, -$this->iMaxDbToKeep);
                 foreach ($aTooOldDbs as $aDb) {
                     $sTooOldDb = $aDb['dbname'];
                     $this->oLogger->info("    Dropping '$sTooOldDb' database…");
@@ -277,6 +342,12 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Asserts that SQL query doesn't return any rows.
+     *
+     * @param string $sQuery
+     * @throws \PHPUnit_Framework_AssertionFailedError
+     */
     protected function assertQueryReturnsNoRows ($sQuery)
     {
         $oPdoStatement = $this->oBuiltDbPdo->query($sQuery);
@@ -284,13 +355,42 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         $this->assertTrue($aRow === false || $aRow === null);
     }
 
-    protected function assertQueryEqualsCsv ($sQuery, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
+    /**
+     * Asserts that SQL query result is equal to CSV file content.
+     *
+     * @param string $sQuery
+     * @param string $sCsvPath   CSV file whose first line contains headers
+     * Sample content:
+     *   id,name,description
+     *   250,FR,France
+     *   826,GB,United Kingdom
+     *   840,US,United States
+     * @param string $sDelimiter CSV field delimiter
+     * @param string $sEnclosure CSV field enclosure
+     * @throws \PHPUnit_Framework_AssertionFailedError
+     */
+    protected function assertQueryResultEqualsCsv ($sQuery, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
     {
         $sResultCsv = $this->convertQuery2Csv($sQuery, $sDelimiter, $sEnclosure);
         $sExpectedCsv = trim(file_get_contents($sCsvPath));
         $this->assertSame($sExpectedCsv, $sResultCsv);
     }
 
+    /**
+     * Converts SQL query result to CSV string.
+     * First CSV line contains headers.
+     *
+     * Returned CSV example:
+     *   id,name,description
+     *   250,FR,France
+     *   826,GB,United Kingdom
+     *   840,US,United States
+     *
+     * @param  string $sQuery SQL query, typically SELECT… FROM…
+     * @param  string $sDelimiter CSV field delimiter
+     * @param  string $sEnclosure CSV field enclosure
+     * @return string
+     */
     protected function convertQuery2Csv ($sQuery, $sDelimiter = ',', $sEnclosure = '"')
     {
         $aRows = $this->pdoFetchAll($sQuery);
@@ -298,24 +398,44 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Exemple de callback :
-     * $sQ1 => function () {
-     *     static $i = 0;
-     *     return ++$i > 200 ? false : array(
-     *         'iso_a3' => $i,
-     *         'name' => '',
-     *         'iso_num' => 0,
-     *         'is_expired' => false,
-     *         'effective_date' => '2000-01-01 00:00:00+00',
-     *         'expiration_date' => '2100-01-01 00:00:00+00'
-     *     );
-     * },
+     * Returns a mocked \PDOStatement instance according to specified query,
+     * whose fetch method returns either a user callback
+     * or a callback consuming line per line a user specified CSV file.
      *
-     * @param $sQuery
-     * @param array $aData
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * Allows to mock a PDO instance for several queries.
+     * Each query should be a key of $aData array parameter. Values are callbacks or CSV filenames.
+     *
+     * All queries are internally normalized to simplify matching.
+     *
+     * In CSV files, following field's values are converted:
+     *   '∅' ⇒ null
+     *   't' ⇒ true
+     *   'f' ⇒ false
+     *
+     * Example usage:
+     * $oPDOMock->expects($this->any())->method('query')->will(
+     *     $this->returnCallback(
+     *         function ($sQuery) use ($that) {
+     *             return $that->getPdoStmtMock(
+     *                 $sQuery,
+     *                 array(
+     *                     'SELECT … FROM A' => '/path/to/csv',
+     *                     'SELECT … FROM B' => function () {
+     *                         static $i = 0;
+     *                         return ++$i > 10 ? false : array('id' => $i, 'name' => md5(rand()));
+     *                     }
+     *                 )
+     *             );
+     *         }
+     *     )
+     * );
+     *
+     * @param string $sQuery SQL query behind \PDOStatement instance
+     * @param array  $aData  Associative array describing for each PDO query which callback to execute
+     * @return \PHPUnit_Framework_MockObject_MockObject|\PDOStatement
+     * @see Tools::normalizeQuery()
      */
-    public function cbPdoQuery ($sQuery, array $aData)
+    public function getPdoStmtMock ($sQuery, array $aData)
     {
         // Normalize queries (keys of $aData):
         foreach ($aData as $sRawQuery => $mValue) {
@@ -325,7 +445,6 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         }
         $sNormalizedQuery = Tools::normalizeQuery($sQuery);
 
-        $oPDOStatement = $this->getMock('\PDOStatement');
         if (! isset($aData[$sNormalizedQuery])) {
             throw new \RuntimeException("Query not handled: '$sNormalizedQuery'!");
 
@@ -333,8 +452,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
             $callback = $aData[$sNormalizedQuery];
 
         } elseif (file_exists($aData[$sNormalizedQuery])) {
-            $aCsv = file($aData[$sNormalizedQuery]);
-            $aCsv = array_filter($aCsv);
+            $aCsv = array_filter(file($aData[$sNormalizedQuery]));
             $callback = function () use ($aCsv) {
                 static $idx = 0, $aHeaders, $iCount;
                 if ($idx == 0) {
@@ -359,14 +477,14 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
             };
 
         } else {
-            $sMsg = "Value of key '$sNormalizedQuery' of data misformed: '{$aData[$sNormalizedQuery]}'.";
+            $sMsg = "Value of key '$sNormalizedQuery' misformed: '{$aData[$sNormalizedQuery]}'.";
             $callback = function () use ($sMsg) {
                 throw new \RuntimeException($sMsg);
             };
         }
-        $oPDOStatement
-            ->expects($this->any())->method('fetch')
-            ->will($this->returnCallback($callback));
-        return $oPDOStatement;
+
+        return $this->getMock('\PDOStatement')
+                    ->expects($this->any())->method('fetch')
+                    ->will($this->returnCallback($callback));
     }
 }
