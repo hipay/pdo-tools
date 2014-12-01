@@ -2,8 +2,6 @@
 
 namespace Himedia\PDOTools;
 
-use GAubry\Helpers\Helpers;
-
 /**
  * Some useful functions.
  *
@@ -12,6 +10,13 @@ use GAubry\Helpers\Helpers;
 class Tools
 {
 
+    /**
+     * Converts associative array to PostgreSQL hstore syntax.
+     *
+     * @param  array  $aData associative array
+     * @return string hstore conversion of specified array
+     * @see http://www.postgresql.org/docs/9.0/static/hstore.html
+     */
     public static function assocArrayToHstore (array $aData)
     {
         $aHstore = array();
@@ -26,18 +31,20 @@ class Tools
     }
 
     /**
-     * @param array $aRows Associative fetch all.
-     * @param $sPath
-     * @param $sDelimiter
-     * @param $sEnclosure
-     * @return string
+     * Export associative result set to CSV file or string.
+     *
+     * @param  array  $aRows      Associative fetch all.
+     * @param  string $sCsvPath   Path to export CSV. Set to '' to export into returning string.
+     * @param  string $sDelimiter Field delimiter
+     * @param  string $sEnclosure Field enclosure
+     * @return string If no $sCsvPath, then CSV formatted string without the trailing newline, else empty string.
      */
-    public static function exportToCSV (array $aRows, $sPath, $sDelimiter, $sEnclosure)
+    public static function exportToCSV (array $aRows, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
     {
-        if (empty($sPath)) {
+        if (empty($sCsvPath)) {
             $hFile = fopen('php://temp/maxmemory:' . (10*1024*1024), 'w');
         } else {
-            $hFile = fopen($sPath, 'w');
+            $hFile = fopen($sCsvPath, 'w');
         }
 
         $bIsHeaderPrinted = false;
@@ -46,32 +53,26 @@ class Tools
                 $bIsHeaderPrinted = true;
                 fputcsv($hFile, array_keys($aRow), $sDelimiter, $sEnclosure);
             }
-            fputcsv($hFile, array_values($aRow), $sDelimiter, $sEnclosure);
+            fputcsv($hFile, $aRow, $sDelimiter, $sEnclosure);
         }
 
-        if (empty($sPath)) {
+        if (empty($sCsvPath)) {
             rewind($hFile);
             $sCSV = stream_get_contents($hFile);
         } else {
             $sCSV = '';
         }
         fclose($hFile);
-        return $sCSV;
+        return rtrim($sCSV, "\n");
     }
 
-    public static function convertAssocRows2Csv (array $aRows)
-    {
-        $aCsv = array();
-        foreach ($aRows as $idx => $aRow) {
-            if ($idx == 0) {
-                $aCsv[] = Helpers::strPutCSV(array_keys($aRow), ',', '"');
-            }
-            $aCsv[] = Helpers::strPutCSV($aRow, ',', '"');
-        }
-        return implode("\n", $aCsv);
-    }
-
-    // See http://stackoverflow.com/a/13823184:
+    /**
+     * Normalize specified query removing comments and multiple white spaces.
+     *
+     * @param $sRawQuery
+     * @return mixed
+     * @see http://stackoverflow.com/a/13823184
+     */
     public static function normalizeQuery ($sRawQuery)
     {
         $sSqlComments = '@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms';

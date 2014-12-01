@@ -279,21 +279,22 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 
     protected function assertQueryReturnsNoRows ($sQuery)
     {
-        $sResultCsv = $this->convertQuery2Csv($sQuery);
-        $this->assertEmpty($sResultCsv);
+        $oPdoStatement = $this->oBuiltDbPdo->query($sQuery);
+        $aRow = $oPdoStatement->fetch(PDO::FETCH_ASSOC);
+        $this->assertTrue($aRow === false || $aRow === null);
     }
 
-    protected function assertQueryEqualsCsv ($sQuery, $sCsvPath)
+    protected function assertQueryEqualsCsv ($sQuery, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
     {
-        $sResultCsv = $this->convertQuery2Csv($sQuery);
+        $sResultCsv = $this->convertQuery2Csv($sQuery, $sDelimiter, $sEnclosure);
         $sExpectedCsv = trim(file_get_contents($sCsvPath));
         $this->assertSame($sExpectedCsv, $sResultCsv);
     }
 
-    protected function convertQuery2Csv ($sQuery)
+    protected function convertQuery2Csv ($sQuery, $sDelimiter = ',', $sEnclosure = '"')
     {
         $aRows = $this->pdoFetchAll($sQuery);
-        return Tools::convertAssocRows2Csv($aRows);
+        return Tools::exportToCSV($aRows, '', $sDelimiter, $sEnclosure);
     }
 
     /**
