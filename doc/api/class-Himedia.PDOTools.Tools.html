@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Himedia\PDOTools\Tools | PDOTools</title>
+
+	<link rel="stylesheet" href="resources/style.css?3901564645">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-Himedia.html">Himedia<span></span></a>
+						<ul>
+				<li class="active main"><a href="namespace-Himedia.PDOTools.html">PDOTools<span></span></a>
+						<ul>
+				<li class="main"><a href="namespace-Himedia.PDOTools.Mocks.html">Mocks</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Himedia.PDOTools.DbTestCase.html">DbTestCase</a></li>
+				<li class="active"><a href="class-Himedia.PDOTools.Tools.html">Tools</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Himedia.PDOTools.html" title="Summary of Himedia\PDOTools"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Tools</h1>
+
+
+	<div class="description">
+	
+<p>Some useful functions.</p>
+
+<p>Copyright (c) 2014 HiMedia Licensed under the GNU Lesser General Public
+License v3 (LGPL version 3).</p>
+
+	</div>
+
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Himedia.html">Himedia</a>\<a href="namespace-Himedia.PDOTools.html">PDOTools</a><br>
+		<b>Package:</b> Himedia\PDOTools<br>
+
+				<b>Copyright:</b>
+				2014 HiMedia<br>
+				<b>License:</b>
+				<a href="http://www.gnu.org/licenses/lgpl.html">http://www.gnu.org/licenses/lgpl.html</a><br>
+		<b>Located at</b> <a href="source-class-Himedia.PDOTools.Tools.html#5-87" title="Go to source code">Himedia/PDOTools/Tools.php</a><br>
+	</div>
+
+
+
+	<table class="summary methods" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="assocArrayToHstore" id="_assocArrayToHstore">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_assocArrayToHstore">#</a>
+		<code><a href="source-class-Himedia.PDOTools.Tools.html#18-36" title="Go to source code">assocArrayToHstore</a>( <span>array <var>$aData</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Converts associative array to PostgreSQL hstore syntax.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Converts associative array to PostgreSQL hstore syntax.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$aData</var></dt>
+					<dd>associative array</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>hstore conversion of specified array<br>
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<a
+href="http://www.postgresql.org/docs/9.0/static/hstore.html">http://www.postgresql.org/docs/9.0/static/hstore.html</a><br>
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="exportToCSV" id="_exportToCSV">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_exportToCSV">#</a>
+		<code><a href="source-class-Himedia.PDOTools.Tools.html#38-72" title="Go to source code">exportToCSV</a>( <span>array <var>$aRows</var></span>, <span>string <var>$sCsvPath</var></span>, <span>string <var>$sDelimiter</var> = <span class="php-quote">','</span></span>, <span>string <var>$sEnclosure</var> = <span class="php-quote">'&quot;'</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Export associative result set to CSV file or string.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Export associative result set to CSV file or string.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$aRows</var></dt>
+					<dd>Associative fetch all.</dd>
+					<dt><var>$sCsvPath</var></dt>
+					<dd>Path to export CSV. Set to '' to export into returning string.</dd>
+					<dt><var>$sDelimiter</var></dt>
+					<dd>Field delimiter</dd>
+					<dt><var>$sEnclosure</var></dt>
+					<dd>Field enclosure</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>If no $sCsvPath, then CSV formatted string without the trailing newline, else
+empty string.<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="normalizeQuery" id="_normalizeQuery">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_normalizeQuery">#</a>
+		<code><a href="source-class-Himedia.PDOTools.Tools.html#74-86" title="Go to source code">normalizeQuery</a>( <span>mixed <var>$sRawQuery</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Normalize specified query removing comments and multiple white spaces.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Normalize specified query removing comments and multiple white spaces.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sRawQuery</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>query normalized by removing comments and multiple white spaces.<br>
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<a
+href="http://stackoverflow.com/a/13823184">http://stackoverflow.com/a/13823184</a><br>
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		PDOTools API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+<script src="resources/combined.js?1325848795"></script>
+<script src="elementlist.js?474507939"></script>
+</body>
+</html>

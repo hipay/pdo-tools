@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="generator" content="ApiGen 2.8.0">
+
+	<title>Class Himedia\PDOTools\DbTestCase | PDOTools</title>
+
+	<link rel="stylesheet" href="resources/style.css?3901564645">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-Himedia.html">Himedia<span></span></a>
+						<ul>
+				<li class="active main"><a href="namespace-Himedia.PDOTools.html">PDOTools<span></span></a>
+						<ul>
+				<li class="main"><a href="namespace-Himedia.PDOTools.Mocks.html">Mocks</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Himedia.PDOTools.DbTestCase.html">DbTestCase</a></li>
+				<li><a href="class-Himedia.PDOTools.Tools.html">Tools</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text">
+		<input type="submit" value="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Himedia.PDOTools.html" title="Summary of Himedia\PDOTools"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+			<li>
+				<a href="deprecated.html" title="List of deprecated elements"><span>Deprecated</span></a>
+			</li>
+			<li>
+				<a href="todo.html" title="Todo list"><span>Todo</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class DbTestCase</h1>
+
+
+	<div class="description">
+	
+<p>Base class to build databases to execute tests.</p>
+
+<p>Copyright (c) 2014 HiMedia Licensed under the GNU Lesser General Public
+License v3 (LGPL version 3).</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+PHPUnit_Framework_TestCase
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by">
+<b><span>Himedia\PDOTools\DbTestCase</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		<b>Abstract</b><br>
+		
+		<b>Namespace:</b> <a href="namespace-Himedia.html">Himedia</a>\<a href="namespace-Himedia.PDOTools.html">PDOTools</a><br>
+		<b>Package:</b> Himedia\PDOTools<br>
+
+				<b>Copyright:</b>
+				2014 HiMedia<br>
+				<b>License:</b>
+				<a href="http://www.gnu.org/licenses/lgpl.html">http://www.gnu.org/licenses/lgpl.html</a><br>
+		<b>Located at</b> <a href="source-class-Himedia.PDOTools.DbTestCase.html#10-522" title="Go to source code">Himedia/PDOTools/DbTestCase.php</a><br>
+	</div>
+
+
+
+	<table class="summary methods" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#88-150" title="Go to source code">__construct</a>( <span>array <var>$aDsn</var></span>, <span>array <var>$aPdoOptions</var></span>, <span>integer <var>$sDbBuildFile</var></span>, <span>string <var>$iMaxDbToKeep</var> = <span class="php-num">3</span></span>, <span>string <var>$sTCName</var> = <span class="php-keyword1">null</span></span>, <span>array <var>$aTCData</var> = <span class="php-keyword1">array</span>()</span>, <span>string <var>$sTCDataName</var> = <span class="php-quote">''</span></span>, <span>Psr\Log\LoggerInterface <var>$oLogger</var> = <span class="php-keyword1">null</span> </span> )</code>
+
+		<div class="description short">
+			
+<p>Build a database for tests and drop too old ones.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Build a database for tests and drop too old ones.</p>
+
+<p><var>$aDsn</var> structure:</p>
+
+<pre><span class="php-keyword1">array</span>(
+    <span
+class="php-quote">'driver'</span>   =&gt; <span
+class="php-quote">'pgsql|mysql|…'</span>,
+    <span
+class="php-quote">'hostname'</span> =&gt; <span
+class="php-quote">'…'</span>,
+    <span
+class="php-quote">'port'</span>     =&gt; <span
+class="php-quote">'…'</span>,
+    <span
+class="php-quote">'dbname'</span>   =&gt; <span
+class="php-quote">'…'</span>,
+    <span
+class="php-quote">'username'</span> =&gt; <span
+class="php-quote">'…'</span>,
+    <span
+class="php-quote">'password'</span> =&gt; <span
+class="php-quote">'…'</span>,
+)</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$aDsn</var></dt>
+					<dd>Data source name of DB to build.</dd>
+					<dt><var>$aPdoOptions</var></dt>
+					<dd>Driver-specific options for PDO connection.</dd>
+					<dt><var>$sDbBuildFile</var></dt>
+					<dd>$iMaxDbToKeep Max number of test databases to keep.</dd>
+					<dt><var>$iMaxDbToKeep</var></dt>
+					<dd>$sDbBuildFile SQL directives to build database (@see loadSqlBuildFile())</dd>
+					<dt><var>$sTCName</var></dt>
+					<dd>PHPUnit_Framework_TestCase's name.</dd>
+					<dt><var>$aTCData</var></dt>
+					<dd>PHPUnit_Framework_TestCase's data.</dd>
+					<dt><var>$sTCDataName</var></dt>
+					<dd>PHPUnit_Framework_TestCase's dataName parameter.</dd>
+					<dt><var>$oLogger</var></dt>
+					<dd>Optional PSR-3 logger.</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getNewPdoInstance" id="_getNewPdoInstance">
+
+		<td class="attributes"><code>
+			 private 
+			PDO
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getNewPdoInstance">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#152-164" title="Go to source code">getNewPdoInstance</a>( <span>string <var>$sDbUser</var></span>, <span>string <var>$sDbName</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns a new PDO instance.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns a new PDO instance.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sDbUser</var></dt>
+					<dd></dd>
+					<dt><var>$sDbName</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>PDO</code><br>PDO<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="loadSqlBuildFile" id="_loadSqlBuildFile">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_loadSqlBuildFile">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#166-191" title="Go to source code">loadSqlBuildFile</a>( <span>string <var>$sDbBuildFile</var></span>, <span>string <var>$sDbUser</var> = <span class="php-quote">''</span></span>, <span>string <var>$sDbName</var> = <span class="php-quote">''</span> </span> )</code>
+
+		<div class="description short">
+			
+<p>Load SQL directives from config/build file, describing how to create a fresh
+database, roles/users and schemas, with listing of fixtures to load.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Load SQL directives from config/build file, describing how to create a fresh
+database, roles/users and schemas, with listing of fixtures to load.</p>
+
+<p>Config/build file is a PHP file returning a list of array('db-user',
+'db-name', 'SQL commands or SQL filename'). All filenames must match following
+regexp: <code>/(\.sql|\.gz)<span class="php-var">$</span>/i</code>.
+Available/injected variables: $sDbUser, $sDbName.</p>
+
+<p>Build file example here: /doc/db-build-file-example.php</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sDbBuildFile</var></dt>
+					<dd>SQL directives</dd>
+					<dt><var>$sDbUser</var></dt>
+					<dd>Optional username injected into $sInitDbFile</dd>
+					<dt><var>$sDbName</var></dt>
+					<dd>Optional DB name injected into $sInitDbFile</dd>
+				</dl></div>
+
+
+
+				<h4>SuppressWarnings(PHPMD.UnusedFormalParameter)</h4>
+				<div class="list">
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="execSql" id="_execSql">
+
+		<td class="attributes"><code>
+			 private 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_execSql">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#193-204" title="Go to source code">execSql</a>( <span>string <var>$sSql</var></span>, <span>string <var>$sDbUser</var></span>, <span>string <var>$sDbName</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Executes specified SQL statement.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Executes specified SQL statement.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sSql</var></dt>
+					<dd>One or more SQL statements</dd>
+					<dt><var>$sDbUser</var></dt>
+					<dd></dd>
+					<dt><var>$sDbName</var></dt>
+					<dd></dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="loadBigSqlDumpFile" id="_loadBigSqlDumpFile">
+
+		<td class="attributes"><code>
+			 private 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_loadBigSqlDumpFile">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#206-226" title="Go to source code">loadBigSqlDumpFile</a>( <span>string <var>$sFilePath</var></span>, <span>string <var>$sDbUser</var></span>, <span>string <var>$sDbName</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Load SQL dump content for file exceeding 1 Mio.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Load SQL dump content for file exceeding 1 Mio.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sFilePath</var></dt>
+					<dd>Path to raw or gzipped SQL file.</dd>
+					<dt><var>$sDbUser</var></dt>
+					<dd></dd>
+					<dt><var>$sDbName</var></dt>
+					<dd></dd>
+				</dl></div>
+
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Himedia.PDOTools.DbTestCase.html#_loadSqlDumpFile">Himedia\PDOTools\DbTestCase::loadSqlDumpFile()</a></code></code><br>
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="loadSqlDumpFile" id="_loadSqlDumpFile">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_loadSqlDumpFile">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#228-270" title="Go to source code">loadSqlDumpFile</a>( <span>string <var>$sFilePath</var></span>, <span>string <var>$sDbUser</var> = <span class="php-quote">''</span></span>, <span>string <var>$sDbName</var> = <span class="php-quote">''</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Load SQL dump file, possibly gzipped (.gz).</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Load SQL dump file, possibly gzipped (.gz).</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sFilePath</var></dt>
+					<dd>Dump file</dd>
+					<dt><var>$sDbUser</var></dt>
+					<dd>By default the user specified in constructor.</dd>
+					<dt><var>$sDbName</var></dt>
+					<dd>By default the DB name specified in constructor.</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="loadSqlBuildArray" id="_loadSqlBuildArray">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_loadSqlBuildArray">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#272-296" title="Go to source code">loadSqlBuildArray</a>( <span>array <var>$aSQLDirectives</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Load SQL directives in specified array.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Load SQL directives in specified array.</p>
+
+<p>SQL directives are a list of array('db-user', 'db-name', 'SQL commands or SQL
+filename'). All filenames must match following regexp:</p>
+
+<pre>/(\.sql|\.gz)$/i</pre>
+
+<p>Example here: /doc/db-build-file-example.php</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$aSQLDirectives</var></dt>
+					<dd>SQL directives to build database</dd>
+				</dl></div>
+
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Himedia.PDOTools.DbTestCase.html#_loadSqlBuildFile">Himedia\PDOTools\DbTestCase::loadSqlBuildFile()</a></code></code><br>
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getAllDb" id="_getAllDb">
+
+		<td class="attributes"><code>
+			 private 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getAllDb">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#298-316" title="Go to source code">getAllDb</a>( <span>string <var>$sPrefixDb</var></span> )</code>
+
+		<div class="description short">
+			
+<p>List all test DBs created with following name pattern: <code>/^{<span
+class="php-var">$sPrefixDb</span>}_[<span class="php-num">0</span>-<span
+class="php-num">9</span>]+<span class="php-var">$</span>/</code>.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>List all test DBs created with following name pattern: <code>/^{<span
+class="php-var">$sPrefixDb</span>}_[<span class="php-num">0</span>-<span
+class="php-num">9</span>]+<span class="php-var">$</span>/</code>.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sPrefixDb</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>list of all test DBs<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="pdoFetchAll" id="_pdoFetchAll">
+
+		<td class="attributes"><code>
+			 protected 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_pdoFetchAll">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#318-330" title="Go to source code">pdoFetchAll</a>( <span>string <var>$sQuery</var></span>, <span>array <var>$aValues</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Fetch all rows.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Fetch all rows.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sQuery</var></dt>
+					<dd></dd>
+					<dt><var>$aValues</var></dt>
+					<dd>Values to bind to the SQL statement.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>an associative array<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="dropOldDbs" id="_dropOldDbs">
+
+		<td class="attributes"><code>
+			 private 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_dropOldDbs">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#332-354" title="Go to source code">dropOldDbs</a>( <span>string <var>$sCurrentDbName</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Drop old test DBs.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Drop old test DBs.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sCurrentDbName</var></dt>
+					<dd>Current DB name, not to remove.</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="assertQueryReturnsNoRows" id="_assertQueryReturnsNoRows">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_assertQueryReturnsNoRows">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#356-367" title="Go to source code">assertQueryReturnsNoRows</a>( <span>string <var>$sQuery</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Asserts that SQL query doesn't return any rows.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Asserts that SQL query doesn't return any rows.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sQuery</var></dt>
+					<dd></dd>
+				</dl></div>
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PHPUnit_Framework_AssertionFailedError</code><br>\PHPUnit_Framework_AssertionFailedError<br>
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="assertQueryResultEqualsCsv" id="_assertQueryResultEqualsCsv">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_assertQueryResultEqualsCsv">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#369-398" title="Go to source code">assertQueryResultEqualsCsv</a>( <span>string <var>$sQuery</var></span>, <span>string <var>$sCsvPath</var></span>, <span>string <var>$sDelimiter</var> = <span class="php-quote">','</span></span>, <span>string <var>$sEnclosure</var> = <span class="php-quote">'&quot;'</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Asserts that SQL query result is equal to CSV file content.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Asserts that SQL query result is equal to CSV file content.</p>
+In CSV files, following field's values are converted:
+<ul>
+	<li>'∅' ⇒ null</li>
+
+	<li>'t' ⇒ true</li>
+
+	<li>'f' ⇒ false</li>
+</ul>
+
+<p><var>$sCsvPath</var> sample content:</p>
+
+<pre>
+  id,name,description
+  250,FR,France
+  826,GB,United Kingdom
+  840,US,United States
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sQuery</var></dt>
+					<dd></dd>
+					<dt><var>$sCsvPath</var></dt>
+					<dd>CSV file whose first line contains headers</dd>
+					<dt><var>$sDelimiter</var></dt>
+					<dd>CSV field delimiter</dd>
+					<dt><var>$sEnclosure</var></dt>
+					<dd>CSV field enclosure</dd>
+				</dl></div>
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PHPUnit_Framework_AssertionFailedError</code><br>\PHPUnit_Framework_AssertionFailedError<br>
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="convertQuery2Csv" id="_convertQuery2Csv">
+
+		<td class="attributes"><code>
+			 protected 
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_convertQuery2Csv">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#400-421" title="Go to source code">convertQuery2Csv</a>( <span>string <var>$sQuery</var></span>, <span>string <var>$sDelimiter</var> = <span class="php-quote">','</span></span>, <span>string <var>$sEnclosure</var> = <span class="php-quote">'&quot;'</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Converts SQL query result to CSV string. First CSV line contains headers.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Converts SQL query result to CSV string. First CSV line contains headers.</p>
+
+<p>Returned CSV example:</p>
+
+<pre>
+  id,name,description
+  250,FR,France
+  826,GB,United Kingdom
+  840,US,United States
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sQuery</var></dt>
+					<dd>SQL query, typically SELECT… FROM…</dd>
+					<dt><var>$sDelimiter</var></dt>
+					<dd>CSV field delimiter</dd>
+					<dt><var>$sEnclosure</var></dt>
+					<dd>CSV field enclosure</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>string<br>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getPdoStmtMock" id="_getPdoStmtMock">
+
+		<td class="attributes"><code>
+			 public 
+			PHPUnit_Framework_MockObject_MockObject|PDOStatement
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getPdoStmtMock">#</a>
+		<code><a href="source-class-Himedia.PDOTools.DbTestCase.html#423-521" title="Go to source code">getPdoStmtMock</a>( <span>string <var>$sQuery</var></span>, <span>array <var>$aData</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns a mocked \PDOStatement instance according to specified query, whose
+fetch method returns either a user callback or a callback consuming line per
+line a user specified CSV file.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns a mocked \PDOStatement instance according to specified query, whose
+fetch method returns either a user callback or a callback consuming line per
+line a user specified CSV file.</p>
+
+<p>Allows to mock a PDO instance for several queries. Each query should be a key
+of $aData array parameter. Values are callbacks or CSV filenames.</p>
+
+<p>All queries are internally normalized to simplify matching.</p>
+In CSV files, following field's values are converted:
+<ul>
+	<li>'∅' ⇒ null</li>
+
+	<li>'t' ⇒ true</li>
+
+	<li>'f' ⇒ false</li>
+</ul>
+
+<p>Example usage in a test method:</p>
+
+<pre>
+<span class="php-var">$oMockPDO</span> = <span
+class="php-var">$this</span>-&gt;getMock(<span
+class="php-quote">'Himedia\PDOTools\Mocks\PDO'</span>, <span
+class="php-keyword1">array</span>(<span
+class="php-quote">'query'</span>));
+<span class="php-var">$that</span> = <span
+class="php-var">$this</span>;
+<span
+class="php-var">$oPDOMock</span>-&gt;expects(<span
+class="php-var">$this</span>-&gt;any())-&gt;method(<span
+class="php-quote">'query'</span>)-&gt;will(
+    <span
+class="php-var">$this</span>-&gt;returnCallback(
+        <span
+class="php-keyword1">function</span> (<span
+class="php-var">$sQuery</span>) <span class="php-keyword1">use</span> (<span
+class="php-var">$that</span>) {
+            <span
+class="php-keyword1">return</span> <span
+class="php-var">$that</span>-&gt;getPdoStmtMock(
+                <span
+class="php-var">$sQuery</span>,
+                <span
+class="php-keyword1">array</span>(
+                    <span
+class="php-quote">'SELECT … FROM A'</span> =&gt; <span
+class="php-quote">'/path/to/csv'</span>,
+                    <span
+class="php-quote">'SELECT … FROM B'</span> =&gt; <span
+class="php-keyword1">function</span> () {
+                        <span
+class="php-keyword1">static</span> <span class="php-var">$i</span> = <span
+class="php-num">0</span>;
+                        <span
+class="php-keyword1">return</span> ++<span class="php-var">$i</span> &gt; <span
+class="php-num">10</span> ? <span class="php-keyword1">false</span> : <span
+class="php-keyword1">array</span>(<span
+class="php-quote">'id'</span> =&gt; <span class="php-var">$i</span>, <span
+class="php-quote">'name'</span> =&gt; <span
+class="php-keyword2">md5</span>(<span
+class="php-keyword2">rand</span>()));
+                    }
+                )
+            );
+        }
+    )
+);
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$sQuery</var></dt>
+					<dd>SQL query behind \PDOStatement instance</dd>
+					<dt><var>$aData</var></dt>
+					<dd>Associative array describing for each PDO query which callback to execute</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>PHPUnit_Framework_MockObject_MockObject|PDOStatement</code><br>\PHPUnit_Framework_MockObject_MockObject|\PDOStatement<br>
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Himedia.PDOTools.Tools.html#_normalizeQuery">Himedia\PDOTools\Tools::normalizeQuery()</a></code></code><br>
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary properties" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="aBuiltDbs" id="$aBuiltDbs">
+		<td class="attributes"><code>
+			private static 
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#23-27" title="Go to source code"><var>$aBuiltDbs</var></a>
+
+			<div class="description short">
+				
+<p>List of DB's name already built (PHPUnit_Framework_TestCase are instantiated
+more than once).</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>List of DB's name already built (PHPUnit_Framework_TestCase are instantiated
+more than once).</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$aBuiltDbs" class="anchor">#</a><code><span class="php-keyword1">array</span>()</code></div></td>
+	</tr>
+	<tr data-order="oBuiltDbPdo" id="$oBuiltDbPdo">
+		<td class="attributes"><code>
+			protected  
+			PDO
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#29-33" title="Go to source code"><var>$oBuiltDbPdo</var></a>
+
+			<div class="description short">
+				
+<p>Backend PDO instance of built DB.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Backend PDO instance of built DB.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$oBuiltDbPdo" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="sPdoDriverName" id="$sPdoDriverName">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#35-39" title="Go to source code"><var>$sPdoDriverName</var></a>
+
+			<div class="description short">
+				
+<p>PDO driver name, e.g. 'pgsql' or 'mysql'.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>PDO driver name, e.g. 'pgsql' or 'mysql'.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$sPdoDriverName" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="sDbHostname" id="$sDbHostname">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#41-45" title="Go to source code"><var>$sDbHostname</var></a>
+
+			<div class="description short">
+				
+<p>Test DB hostname.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Test DB hostname.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$sDbHostname" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="iDbPort" id="$iDbPort">
+		<td class="attributes"><code>
+			protected  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#47-51" title="Go to source code"><var>$iDbPort</var></a>
+
+			<div class="description short">
+				
+<p>Test DB port.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Test DB port.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$iDbPort" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="sDbName" id="$sDbName">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#53-57" title="Go to source code"><var>$sDbName</var></a>
+
+			<div class="description short">
+				
+<p>Test DB name.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Test DB name.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$sDbName" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="sDbUser" id="$sDbUser">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#59-63" title="Go to source code"><var>$sDbUser</var></a>
+
+			<div class="description short">
+				
+<p>Test DB username.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Test DB username.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$sDbUser" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="sDbPassword" id="$sDbPassword">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#65-69" title="Go to source code"><var>$sDbPassword</var></a>
+
+			<div class="description short">
+				
+<p>Test DB password.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Test DB password.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$sDbPassword" class="anchor">#</a><code></code></div></td>
+	</tr>
+	<tr data-order="aPdoOptions" id="$aPdoOptions">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#71-80" title="Go to source code"><var>$aPdoOptions</var></a>
+
+			<div class="description short">
+				
+<p>Default PDO options on new instantiation.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Default PDO options on new instantiation.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$aPdoOptions" class="anchor">#</a><code><span class="php-keyword1">array</span>(
+    PDO::ATTR_ERRMODE            =&gt; PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   =&gt; <span class="php-keyword1">true</span>,
+    PDO::ATTR_TIMEOUT            =&gt; <span class="php-num">5</span>
+)</code></div></td>
+	</tr>
+	<tr data-order="iMaxDbToKeep" id="$iMaxDbToKeep">
+		<td class="attributes"><code>
+			protected  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Himedia.PDOTools.DbTestCase.html#82-86" title="Go to source code"><var>$iMaxDbToKeep</var></a>
+
+			<div class="description short">
+				
+<p>Max number of test DBs to keep.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>Max number of test DBs to keep.</p>
+
+
+			</div>
+		</td>
+		<td class="value"><div><a href="#$iMaxDbToKeep" class="anchor">#</a><code></code></div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		PDOTools API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+<script src="resources/combined.js?1325848795"></script>
+<script src="elementlist.js?474507939"></script>
+</body>
+</html>
