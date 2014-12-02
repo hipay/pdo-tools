@@ -9,6 +9,13 @@ use Psr\Log\NullLogger;
 
 /**
  * Base class to build databases to execute tests.
+ *
+ * Copyright (c) 2014 HiMedia
+ * Licensed under the GNU Lesser General Public License v3 (LGPL version 3).
+ *
+ * @package Himedia\PDOTools
+ * @copyright 2014 HiMedia
+ * @license http://www.gnu.org/licenses/lgpl.html
  */
 abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 {

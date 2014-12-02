@@ -5,7 +5,12 @@ namespace Himedia\PDOTools;
 /**
  * Some useful functions.
  *
+ * Copyright (c) 2014 HiMedia
+ * Licensed under the GNU Lesser General Public License v3 (LGPL version 3).
+ *
  * @package Himedia\PDOTools
+ * @copyright 2014 HiMedia
+ * @license http://www.gnu.org/licenses/lgpl.html
  */
 class Tools
 {
