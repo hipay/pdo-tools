@@ -3,9 +3,9 @@
 namespace Himedia\PDOTools;
 
 use GAubry\Helpers\Helpers;
-use GAubry\Logger\MinimalLogger;
-use Psr\Log\LogLevel;
 use PDO;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Base class to build databases to execute tests.
@@ -97,6 +97,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sTCName      PHPUnit_Framework_TestCase's name.
      * @param array  $aTCData      PHPUnit_Framework_TestCase's data.
      * @param string $sTCDataName  PHPUnit_Framework_TestCase's dataName parameter.
+     * @param LoggerInterface $oLogger Optional PSR-3 logger.
      */
     public function __construct(
         array $aDsn,
@@ -105,7 +106,8 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
         $iMaxDbToKeep  = 3,
         $sTCName       = null,
         array $aTCData = array(),
-        $sTCDataName   = ''
+        $sTCDataName   = '',
+        LoggerInterface $oLogger = null
     ) {
         parent::__construct($sTCName, $aTCData, $sTCDataName);
 
@@ -119,7 +121,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
 
         // 1 is min to not drop current database:
         $this->iMaxDbToKeep   = max(1, (int)$iMaxDbToKeep);
-        $this->oLogger        = new MinimalLogger(LogLevel::DEBUG);
+        $this->oLogger        = $oLogger ?: new NullLogger();
 
         // PHPUnit_Framework_TestCase are instantiated more than once…
         if (! in_array($this->sDbName, self::$aBuiltDbs)) {

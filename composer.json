@@ -1,12 +1,20 @@
 {
-    "name": "hi-media/pdo-tools",
-    "description": "PDO Tools",
-    "keywords": ["PDO", "lazy loading", "PHPUnit"],
+    "name":        "hi-media/pdo-tools",
+    "description": "Some PHP PDO tools to facilitate creation of fixtures for database content with PHPUnit.",
+    "keywords":    ["PDO", "fixtures", "databse", "PHPUnit"],
+    "type":        "library",
+    "license":     "LGPL-3.0+",
+    "authors": [
+        {
+            "name":  "Geoffroy Aubry",
+            "email": "gaubry@hi-media.com"
+        }
+    ],
     "require": {
-        "ext-PDO":                     "*",
-        "geoffroy-aubry/logger":       "1.*",
-        "php":                         ">=5.3.3",
-        "psr/log":                     "~1.0"
+        "ext-PDO":                   "*",
+        "geoffroy-aubry/helpers":    "1.*",
+        "php":                       ">=5.3.3",
+        "psr/log":                   "~1.0"
     },
     "require-dev": {
         "apigen/apigen":             "~2.8",

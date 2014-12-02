@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3ad20e341a9ca75eb4bc29b92cec1d51",
+    "hash": "ef10554e90a0b9e03fac49189481b34c",
     "packages": [
         {
             "name": "geoffroy-aubry/helpers",
@@ -53,58 +53,6 @@
                 "tools"
             ],
             "time": "2013-11-09 18:17:42"
-        },
-        {
-            "name": "geoffroy-aubry/logger",
-            "version": "v1.1.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/geoffroy-aubry/Logger.git",
-                "reference": "c4bdba86091ab414f523a1e33a0f85cd1541635a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/geoffroy-aubry/Logger/zipball/c4bdba86091ab414f523a1e33a0f85cd1541635a",
-                "reference": "c4bdba86091ab414f523a1e33a0f85cd1541635a",
-                "shasum": ""
-            },
-            "require": {
-                "geoffroy-aubry/helpers": "1.*",
-                "php": ">=5.3.3",
-                "psr/log": "1.0.0"
-            },
-            "require-dev": {
-                "apigen/apigen": "2.8.0",
-                "phpmd/phpmd": "1.4.*",
-                "phpunit/phpunit": ">=3.7",
-                "satooshi/php-coveralls": "dev-master",
-                "squizlabs/php_codesniffer": "1.4.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "GAubry\\Logger": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Geoffroy Aubry",
-                    "email": "geoffroy.aubry@free.fr"
-                }
-            ],
-            "description": "PSR-3 logger for adding colors and indentation on PHP CLI output.",
-            "keywords": [
-                "bash color logging",
-                "color logging",
-                "indent logging",
-                "logger",
-                "psr-3"
-            ],
-            "time": "2013-07-03 09:20:17"
         },
         {
             "name": "psr/log",
@@ -1011,17 +959,17 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.5.7",
+            "version": "v2.6.0",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "61b13c27c9258e97009249d4ef193c964bf346b7"
+                "reference": "d3bac228fd7a2aac9193e241b239880b3ba39a10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/61b13c27c9258e97009249d4ef193c964bf346b7",
-                "reference": "61b13c27c9258e97009249d4ef193c964bf346b7",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/d3bac228fd7a2aac9193e241b239880b3ba39a10",
+                "reference": "d3bac228fd7a2aac9193e241b239880b3ba39a10",
                 "shasum": ""
             },
             "require": {
@@ -1029,16 +977,18 @@
             },
             "require-dev": {
                 "psr/log": "~1.0",
-                "symfony/event-dispatcher": "~2.1"
+                "symfony/event-dispatcher": "~2.1",
+                "symfony/process": "~2.1"
             },
             "suggest": {
                 "psr/log": "For using the console logger",
-                "symfony/event-dispatcher": ""
+                "symfony/event-dispatcher": "",
+                "symfony/process": ""
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -1062,21 +1012,21 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2014-11-20 13:22:25"
+            "time": "2014-11-20 13:24:23"
         },
         {
             "name": "symfony/finder",
-            "version": "v2.5.7",
+            "version": "v2.6.0",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder.git",
-                "reference": "743aabbf4958663ef626e10ae3a6c7b17a0fa3bd"
+                "reference": "d574347c652a14cfee0349f744c7880e1d9029fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Finder/zipball/743aabbf4958663ef626e10ae3a6c7b17a0fa3bd",
-                "reference": "743aabbf4958663ef626e10ae3a6c7b17a0fa3bd",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/d574347c652a14cfee0349f744c7880e1d9029fd",
+                "reference": "d574347c652a14cfee0349f744c7880e1d9029fd",
                 "shasum": ""
             },
             "require": {
@@ -1085,7 +1035,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -1109,21 +1059,21 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
-            "time": "2014-10-26 07:41:27"
+            "time": "2014-11-28 10:00:40"
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.5.7",
+            "version": "v2.6.0",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "900d38bc8f74a50343ce65dd1c1e9819658ee56b"
+                "reference": "51c845cf3e4bfc182d1d5c05ed1c7338361d86f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/900d38bc8f74a50343ce65dd1c1e9819658ee56b",
-                "reference": "900d38bc8f74a50343ce65dd1c1e9819658ee56b",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/51c845cf3e4bfc182d1d5c05ed1c7338361d86f8",
+                "reference": "51c845cf3e4bfc182d1d5c05ed1c7338361d86f8",
                 "shasum": ""
             },
             "require": {
@@ -1132,7 +1082,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -1156,7 +1106,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-11-20 13:22:25"
+            "time": "2014-11-20 13:24:23"
         },
         {
             "name": "texy/texy",
