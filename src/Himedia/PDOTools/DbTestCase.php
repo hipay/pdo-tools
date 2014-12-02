@@ -88,15 +88,16 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Build a database for tests and drop too old ones.
      *
-     * @param array $aDsn Data source name of DB to build.
-     * Structure: array(
+     * <var>$aDsn</var> structure: <code>array(
      *     'driver'   => 'pgsql|mysql|…',
      *     'hostname' => '…',
      *     'port'     => '…',
      *     'dbname'   => '…',
      *     'username' => '…',
      *     'password' => '…',
-     * )
+     * )</code>
+     *
+     * @param array $aDsn Data source name of DB to build.
      * @param array  $aPdoOptions  Driver-specific options for PDO connection.
      * @param int    $iMaxDbToKeep Max number of test databases to keep.
      * @param string $sDbBuildFile SQL directives to build database (@see loadSqlBuildFile())
@@ -155,7 +156,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sDbName
      * @return PDO
      */
-    private function getNewPdoInstance ($sDbUser, $sDbName)
+    private function getNewPdoInstance($sDbUser, $sDbName)
     {
         $sDsn = "$this->sPdoDriverName:host=$this->sDbHostname;port=$this->iDbPort;"
               . "dbname=$sDbName;user=$sDbUser;password=";
@@ -163,10 +164,11 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Load SQL directives from config/build file.
+     * Load SQL directives from config/build file,
+     * describing how to create a fresh database, roles/users and schemas, with listing of fixtures to load.
      *
      * Config/build file is a PHP file returning a list of array('db-user', 'db-name', 'SQL commands or SQL filename').
-     * All filenames must match following regexp: /(\.sql|\.gz)$/i.
+     * All filenames must match following regexp: <code>/(\.sql|\.gz)$/i</code>.
      * Available/injected variables: $sDbUser, $sDbName.
      *
      * Build file example here: /doc/db-build-file-example.php
@@ -176,7 +178,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sDbName      Optional DB name injected into $sInitDbFile
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function loadSqlBuildFile (
+    protected function loadSqlBuildFile(
         $sDbBuildFile,
         /** @noinspection PhpUnusedParameterInspection */
         $sDbUser = '',
@@ -195,7 +197,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sDbUser
      * @param string $sDbName
      */
-    private function execSql ($sSql, $sDbUser, $sDbName)
+    private function execSql($sSql, $sDbUser, $sDbName)
     {
         $this->getNewPdoInstance($sDbUser, $sDbName)
              ->exec($sSql);
@@ -209,7 +211,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sDbName
      * @see loadSqlDumpFile()
      */
-    private function loadBigSqlDumpFile ($sFilePath, $sDbUser, $sDbName)
+    private function loadBigSqlDumpFile($sFilePath, $sDbUser, $sDbName)
     {
         if ($this->sPdoDriverName == 'pgsql') {
             $sCmd = "psql -v ON_ERROR_STOP=1 -h $this->sDbHostname -p $this->iDbPort -U $sDbUser $sDbName "
@@ -230,7 +232,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sDbUser By default the user specified in constructor.
      * @param string $sDbName By default the DB name specified in constructor.
      */
-    protected function loadSqlDumpFile ($sFilePath, $sDbUser = '', $sDbName = '')
+    protected function loadSqlDumpFile($sFilePath, $sDbUser = '', $sDbName = '')
     {
         $sDbUser = $sDbUser ?: $this->sDbUser;
         $sDbName = $sDbName ?: $this->sDbName;
@@ -271,14 +273,14 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * Load SQL directives in specified array.
      *
      * SQL directives are a list of array('db-user', 'db-name', 'SQL commands or SQL filename').
-     * All filenames must match following regexp: /(\.sql|\.gz)$/i.
+     * All filenames must match following regexp: <pre>/(\.sql|\.gz)$/i</pre>.
      *
      * Example here: /doc/db-build-file-example.php
      *
      * @param array $aSQLDirectives SQL directives to build database
      * @see loadSqlBuildFile()
      */
-    protected function loadSqlBuildArray (array $aSQLDirectives)
+    protected function loadSqlBuildArray(array $aSQLDirectives)
     {
         foreach ($aSQLDirectives as $aStatement) {
             list($sDbUser, $sDbName, $sCommands) = $aStatement;
@@ -294,12 +296,12 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * List all test DBs created with following name pattern: '^{$sPrefixDb}_[0-9]+$'.
+     * List all test DBs created with following name pattern: <code>/^{$sPrefixDb}_[0-9]+$/</code>.
      *
      * @param string $sPrefixDb
      * @return array list of all test DBs
      */
-    private function getAllDb ($sPrefixDb)
+    private function getAllDb($sPrefixDb)
     {
         if ($this->sPdoDriverName == 'pgsql') {
             $sQuery = "
@@ -332,7 +334,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      *
      * @param string $sCurrentDbName Current DB name, not to remove.
      */
-    private function dropOldDbs ($sCurrentDbName)
+    private function dropOldDbs($sCurrentDbName)
     {
         if (preg_match('/^(.*)_[0-9]+$/i', $sCurrentDbName, $aMatches) === 1) {
             $this->oLogger->info('Searching too old databases…');
@@ -357,7 +359,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * @param string $sQuery
      * @throws \PHPUnit_Framework_AssertionFailedError
      */
-    protected function assertQueryReturnsNoRows ($sQuery)
+    protected function assertQueryReturnsNoRows($sQuery)
     {
         $oPdoStatement = $this->oBuiltDbPdo->query($sQuery);
         $aRow = $oPdoStatement->fetch(PDO::FETCH_ASSOC);
@@ -367,18 +369,28 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     /**
      * Asserts that SQL query result is equal to CSV file content.
      *
-     * @param string $sQuery
-     * @param string $sCsvPath   CSV file whose first line contains headers
-     * Sample content:
+     * In CSV files, following field's values are converted:
+     * <ul>
+     *   <li>'∅' ⇒ null</li>
+     *   <li>'t' ⇒ true</li>
+     *   <li>'f' ⇒ false</li>
+     * </ul>
+     *
+     * <var>$sCsvPath</var> sample content:
+     * <pre>
      *   id,name,description
      *   250,FR,France
      *   826,GB,United Kingdom
      *   840,US,United States
+     * </pre>
+     *
+     * @param string $sQuery
+     * @param string $sCsvPath   CSV file whose first line contains headers
      * @param string $sDelimiter CSV field delimiter
      * @param string $sEnclosure CSV field enclosure
      * @throws \PHPUnit_Framework_AssertionFailedError
      */
-    protected function assertQueryResultEqualsCsv ($sQuery, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
+    protected function assertQueryResultEqualsCsv($sQuery, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
     {
         $sResultCsv = $this->convertQuery2Csv($sQuery, $sDelimiter, $sEnclosure);
         $sExpectedCsv = trim(file_get_contents($sCsvPath));
@@ -390,17 +402,19 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * First CSV line contains headers.
      *
      * Returned CSV example:
+     * <pre>
      *   id,name,description
      *   250,FR,France
      *   826,GB,United Kingdom
      *   840,US,United States
+     * </pre>
      *
      * @param  string $sQuery SQL query, typically SELECT… FROM…
      * @param  string $sDelimiter CSV field delimiter
      * @param  string $sEnclosure CSV field enclosure
      * @return string
      */
-    protected function convertQuery2Csv ($sQuery, $sDelimiter = ',', $sEnclosure = '"')
+    protected function convertQuery2Csv($sQuery, $sDelimiter = ',', $sEnclosure = '"')
     {
         $aRows = $this->pdoFetchAll($sQuery);
         return Tools::exportToCSV($aRows, '', $sDelimiter, $sEnclosure);
@@ -417,11 +431,16 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      * All queries are internally normalized to simplify matching.
      *
      * In CSV files, following field's values are converted:
-     *   '∅' ⇒ null
-     *   't' ⇒ true
-     *   'f' ⇒ false
+     * <ul>
+     *   <li>'∅' ⇒ null</li>
+     *   <li>'t' ⇒ true</li>
+     *   <li>'f' ⇒ false</li>
+     * </ul>
      *
-     * Example usage:
+     * Example usage in a test method:
+     * <code>
+     * $oMockPDO = $this->getMock('Himedia\PDOTools\Mocks\PDO', array('query'));
+     * $that = $this;
      * $oPDOMock->expects($this->any())->method('query')->will(
      *     $this->returnCallback(
      *         function ($sQuery) use ($that) {
@@ -438,13 +457,14 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
      *         }
      *     )
      * );
+     * </code>
      *
      * @param string $sQuery SQL query behind \PDOStatement instance
      * @param array  $aData  Associative array describing for each PDO query which callback to execute
      * @return \PHPUnit_Framework_MockObject_MockObject|\PDOStatement
      * @see Tools::normalizeQuery()
      */
-    public function getPdoStmtMock ($sQuery, array $aData)
+    public function getPdoStmtMock($sQuery, array $aData)
     {
         // Normalize queries (keys of $aData):
         foreach ($aData as $sRawQuery => $mValue) {

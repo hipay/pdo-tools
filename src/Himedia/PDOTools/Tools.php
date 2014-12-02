@@ -22,7 +22,7 @@ class Tools
      * @return string hstore conversion of specified array
      * @see http://www.postgresql.org/docs/9.0/static/hstore.html
      */
-    public static function assocArrayToHstore (array $aData)
+    public static function assocArrayToHstore(array $aData)
     {
         $aHstore = array();
         foreach ($aData as $sKey => $sValue) {
@@ -44,7 +44,7 @@ class Tools
      * @param  string $sEnclosure Field enclosure
      * @return string If no $sCsvPath, then CSV formatted string without the trailing newline, else empty string.
      */
-    public static function exportToCSV (array $aRows, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
+    public static function exportToCSV(array $aRows, $sCsvPath, $sDelimiter = ',', $sEnclosure = '"')
     {
         if (empty($sCsvPath)) {
             $hFile = fopen('php://temp/maxmemory:' . (10*1024*1024), 'w');
@@ -75,10 +75,10 @@ class Tools
      * Normalize specified query removing comments and multiple white spaces.
      *
      * @param $sRawQuery
-     * @return mixed
+     * @return string query normalized by removing comments and multiple white spaces.
      * @see http://stackoverflow.com/a/13823184
      */
-    public static function normalizeQuery ($sRawQuery)
+    public static function normalizeQuery($sRawQuery)
     {
         $sSqlComments = '@(([\'"]).*?[^\\\]\2)|((?:\#|--).*?$|/\*(?:[^/*]|/(?!\*)|\*(?!/)|(?R))*\*\/)\s*|(?<=;)\s+@ms';
         $sNormalizedQuery = preg_replace('/\s+/', ' ', trim(preg_replace($sSqlComments, '$1', $sRawQuery)));
