@@ -160,7 +160,7 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
     {
         $sDsn = "$this->sPdoDriverName:host=$this->sDbHostname;port=$this->iDbPort;"
               . "dbname=$sDbName;user=$sDbUser;password=";
-        return new PDO($sDsn, null, null, $this->aPdoOptions);
+        return new PDO($sDsn, $sDbUser, null, $this->aPdoOptions);
     }
 
     /**
@@ -307,11 +307,17 @@ abstract class DbTestCase extends \PHPUnit_Framework_TestCase
             $sQuery = "
                     SELECT datname AS dbname FROM pg_database
                     WHERE datname ~ '^{$sPrefixDb}_[0-9]+$' ORDER BY datname ASC";
+            $aAllDb = $this->pdoFetchAll($sQuery);
+        } elseif ($this->sPdoDriverName == 'mysql') {
+            $sQuery = "SHOW DATABASES where `Database` REGEXP '^{$sPrefixDb}_[0-9]+$'";
+            $aAllDb = [];
+            foreach ($this->pdoFetchAll($sQuery) as $aRow) {
+                $aAllDb[] = ['dbname' => $aRow['Database']];
+            }
         } else {
             $sErrMsg = "Driver type '$this->sPdoDriverName' not handled for listing all databases!";
             throw new \UnexpectedValueException($sErrMsg, 1);
         }
-        $aAllDb = $this->pdoFetchAll($sQuery);
         return $aAllDb;
     }
 
