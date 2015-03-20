@@ -1,5 +1,5 @@
 {
-    "name":        "geoffroy-aubry/pdo-tools",
+    "name":        "hi-media/pdo-tools",
     "description": "Simplifies the build of a database for testing purposes and allows you to easily verify the contents of a database after operations.",
     "keywords":    ["PDO", "fixture", "database", "mock", "PHPUnit"],
     "type":        "library",
